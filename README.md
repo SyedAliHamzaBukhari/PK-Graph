@@ -147,7 +147,7 @@ Flexible categorization and citation system
 
 ### 1. Clone and Setup
 ```bash
-git clone <repository-url>
+git clone <https://github.com/SyedAliHamzaBukhari/PK-Graph>
 cd personal-knowledge-graph
 ```
 
