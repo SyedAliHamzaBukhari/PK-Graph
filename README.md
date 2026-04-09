@@ -203,7 +203,6 @@ npm run dev
 - `GET /api/graph/components` - Connected components
 - `GET /api/graph/export` - Export graph data
 
-
 ## Advanced Features
 
 ### Graph Algorithms
@@ -225,20 +224,6 @@ npm run dev
 - **Performance Metrics**: Query execution tracking
 - **Graph Statistics**: Real-time graph metrics
 - **Usage Patterns**: User behavior analysis
-
-## Performance Benchmarks
-
-### Database Performance
-- **Concept Search**: < 100ms for 1000+ concepts
-- **Note Search**: < 200ms with full-text relevance
-- **Graph Traversal**: < 500ms for 3-hop connections
-- **Similarity Calculation**: < 1s for concept similarity
-
-### System Metrics
-- **Response Time**: < 200ms average API response
-- **Concurrent Users**: 100+ simultaneous users
-- **Data Volume**: Optimized for 10,000+ concepts, 50,000+ notes
-- **Search Performance**: Sub-second full-text search
 
 ## Testing
 
