@@ -1,0 +1,273 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model concept_summaries {
+  concept_id       Int       @id
+  note_count       Int?      @default(0)
+  link_count       Int?      @default(0)
+  avg_importance   Decimal?  @default(0.00) @db.Decimal(3, 2)
+  last_activity    DateTime? @db.Timestamp(0)
+  summary_text     String?   @db.Text
+  key_tags         Json?
+  related_concepts Json?
+  last_updated     DateTime? @default(now()) @db.Timestamp(0)
+  concepts         concepts  @relation(fields: [concept_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_summary_concept")
+
+  @@index([last_activity], map: "idx_summary_activity")
+  @@index([avg_importance], map: "idx_summary_importance")
+  @@index([link_count], map: "idx_summary_links")
+  @@index([link_count(sort: Desc), last_activity(sort: Desc)], map: "idx_summary_links_activity")
+  @@index([note_count], map: "idx_summary_notes")
+  @@index([note_count(sort: Desc), avg_importance(sort: Desc)], map: "idx_summary_notes_importance")
+  @@index([last_updated], map: "idx_summary_updated")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model concepts {
+  id                                      Int                @id @default(autoincrement())
+  name                                    String             @unique(map: "uq_concept_name") @db.VarChar(255)
+  description                             String?            @db.Text
+  type                                    concepts_type?     @default(concept)
+  created_at                              DateTime?          @default(now()) @db.Timestamp(0)
+  updated_at                              DateTime?          @default(now()) @db.Timestamp(0)
+  concept_summaries                       concept_summaries?
+  links_links_source_concept_idToconcepts links[]            @relation("links_source_concept_idToconcepts")
+  links_links_target_concept_idToconcepts links[]            @relation("links_target_concept_idToconcepts")
+  notes                                   notes[]
+
+  @@index([created_at], map: "idx_concept_created")
+  @@index([created_at, type], map: "idx_concept_created_type")
+  @@index([name], map: "idx_concept_name")
+  @@index([type], map: "idx_concept_type")
+  @@index([type, name, created_at], map: "idx_concept_type_name_created")
+  @@fulltext([name, description], map: "ft_concept_search")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model graph_metrics {
+  id                          Int       @id @default(autoincrement())
+  metric_date                 DateTime  @unique(map: "metric_date") @db.Date
+  total_concepts              Int?      @default(0)
+  total_notes                 Int?      @default(0)
+  total_links                 Int?      @default(0)
+  total_tags                  Int?      @default(0)
+  avg_connections_per_concept Decimal?  @default(0.00) @db.Decimal(5, 2)
+  most_connected_concept      Int?
+  queries_executed            Int?      @default(0)
+  created_at                  DateTime? @default(now()) @db.Timestamp(0)
+
+  @@index([total_concepts], map: "idx_metrics_concepts")
+  @@index([metric_date], map: "idx_metrics_date")
+  @@index([metric_date(sort: Desc), total_concepts(sort: Desc)], map: "idx_metrics_date_concepts")
+  @@index([queries_executed], map: "idx_metrics_queries")
+  @@index([queries_executed(sort: Desc), metric_date(sort: Desc)], map: "idx_metrics_queries_date")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model links {
+  id                                         Int                      @id @default(autoincrement())
+  source_concept_id                          Int
+  target_concept_id                          Int
+  relationship_type                          links_relationship_type? @default(related_to)
+  strength                                   Decimal?                 @default(0.50) @db.Decimal(3, 2)
+  description                                String?                  @db.Text
+  bidirectional                              Boolean?                 @default(false)
+  created_at                                 DateTime?                @default(now()) @db.Timestamp(0)
+  updated_at                                 DateTime?                @default(now()) @db.Timestamp(0)
+  concepts_links_source_concept_idToconcepts concepts                 @relation("links_source_concept_idToconcepts", fields: [source_concept_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_link_source_concept")
+  concepts_links_target_concept_idToconcepts concepts                 @relation("links_target_concept_idToconcepts", fields: [target_concept_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_link_target_concept")
+
+  @@unique([source_concept_id, target_concept_id, relationship_type], map: "uq_directed_link")
+  @@index([bidirectional], map: "idx_link_bidirectional")
+  @@index([created_at], map: "idx_link_created")
+  @@index([source_concept_id], map: "idx_link_source")
+  @@index([source_concept_id, strength(sort: Desc), created_at], map: "idx_link_source_strength_created")
+  @@index([strength], map: "idx_link_strength")
+  @@index([target_concept_id], map: "idx_link_target")
+  @@index([target_concept_id, strength(sort: Desc), created_at], map: "idx_link_target_strength_created")
+  @@index([relationship_type], map: "idx_link_type")
+  @@index([relationship_type, strength(sort: Desc), bidirectional], map: "idx_link_type_strength_bidirectional")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model note_sources {
+  note_id        Int
+  source_id      Int
+  citation_text  String?   @db.Text
+  page_reference String?   @db.VarChar(100)
+  created_at     DateTime? @default(now()) @db.Timestamp(0)
+  notes          notes     @relation(fields: [note_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_notesource_note")
+  sources        sources   @relation(fields: [source_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_notesource_source")
+
+  @@id([note_id, source_id])
+  @@index([created_at], map: "idx_notesource_created")
+  @@index([note_id], map: "idx_notesource_note")
+  @@index([source_id], map: "idx_notesource_source")
+}
+
+model note_tags {
+  note_id    Int
+  tag_id     Int
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+  notes      notes     @relation(fields: [note_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_notetag_note")
+  tags       tags      @relation(fields: [tag_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_notetag_tag")
+
+  @@id([note_id, tag_id])
+  @@index([created_at(sort: Desc)], map: "idx_notetag_created")
+  @@index([note_id], map: "idx_notetag_note")
+  @@index([note_id, tag_id], map: "idx_notetag_note_tag")
+  @@index([tag_id], map: "idx_notetag_tag")
+  @@index([tag_id, created_at(sort: Desc)], map: "idx_notetag_tag_created")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model notes {
+  id               Int                @id @default(autoincrement())
+  concept_id       Int
+  title            String             @db.VarChar(500)
+  body             String             @db.Text
+  source_url       String?            @db.VarChar(2048)
+  source_type      notes_source_type? @default(personal)
+  importance_score Decimal?           @default(0.50) @db.Decimal(3, 2)
+  is_private       Boolean?           @default(false)
+  created_at       DateTime?          @default(now()) @db.Timestamp(0)
+  updated_at       DateTime?          @default(now()) @db.Timestamp(0)
+  note_sources     note_sources[]
+  note_tags        note_tags[]
+  concepts         concepts           @relation(fields: [concept_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_notes_concept")
+
+  @@index([concept_id], map: "idx_note_concept")
+  @@index([concept_id, importance_score(sort: Desc), created_at(sort: Desc)], map: "idx_note_concept_importance_created")
+  @@index([created_at], map: "idx_note_created")
+  @@index([importance_score], map: "idx_note_importance")
+  @@index([is_private], map: "idx_note_private")
+  @@index([is_private, created_at(sort: Desc)], map: "idx_note_private_created")
+  @@index([source_type], map: "idx_note_source_type")
+  @@index([source_type, importance_score(sort: Desc), created_at(sort: Desc)], map: "idx_note_type_importance_created")
+  @@fulltext([title, body], map: "ft_note_search")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model query_history {
+  id                Int                       @id @default(autoincrement())
+  search_query      String                    @db.VarChar(500)
+  query_type        query_history_query_type? @default(note_search)
+  results_count     Int?                      @default(0)
+  execution_time_ms Int?                      @default(0)
+  user_session      String?                   @db.VarChar(100)
+  ip_address        String?                   @db.VarChar(45)
+  user_agent        String?                   @db.Text
+  created_at        DateTime?                 @default(now()) @db.Timestamp(0)
+
+  @@index([created_at], map: "idx_query_created")
+  @@index([execution_time_ms], map: "idx_query_execution_time")
+  @@index([execution_time_ms(sort: Desc), created_at(sort: Desc)], map: "idx_query_execution_time_created")
+  @@index([results_count], map: "idx_query_results")
+  @@index([search_query], map: "idx_query_search")
+  @@index([user_session], map: "idx_query_session")
+  @@index([query_type], map: "idx_query_type")
+  @@index([query_type, results_count(sort: Desc), created_at(sort: Desc)], map: "idx_query_type_results_created")
+  @@fulltext([search_query], map: "ft_query_text")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model sources {
+  id                Int                  @id @default(autoincrement())
+  title             String               @db.VarChar(500)
+  author            String?              @db.VarChar(255)
+  publication_year  Int?
+  url               String?              @db.VarChar(2048)
+  source_type       sources_source_type? @default(website)
+  doi               String?              @db.VarChar(100)
+  isbn              String?              @db.VarChar(20)
+  metadata          Json?
+  credibility_score Decimal?             @default(0.50) @db.Decimal(3, 2)
+  created_at        DateTime?            @default(now()) @db.Timestamp(0)
+  updated_at        DateTime?            @default(now()) @db.Timestamp(0)
+  note_sources      note_sources[]
+
+  @@index([author], map: "idx_source_author")
+  @@index([created_at], map: "idx_source_created")
+  @@index([credibility_score], map: "idx_source_credibility")
+  @@index([credibility_score(sort: Desc), publication_year(sort: Desc), source_type], map: "idx_source_credibility_year_type")
+  @@index([title], map: "idx_source_title")
+  @@index([source_type], map: "idx_source_type")
+  @@index([source_type, created_at(sort: Desc)], map: "idx_source_type_created")
+  @@index([publication_year], map: "idx_source_year")
+  @@fulltext([title, author], map: "ft_source_search")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model tags {
+  id          Int         @id @default(autoincrement())
+  name        String      @unique(map: "uq_tag_name") @db.VarChar(100)
+  color       String?     @default("#808080") @db.VarChar(7)
+  description String?     @db.Text
+  usage_count Int?        @default(0)
+  created_at  DateTime?   @default(now()) @db.Timestamp(0)
+  note_tags   note_tags[]
+
+  @@index([created_at], map: "idx_tag_created")
+  @@index([name], map: "idx_tag_name")
+  @@index([usage_count], map: "idx_tag_usage")
+}
+
+enum query_history_query_type {
+  concept_search
+  note_search
+  graph_traversal
+  similarity
+  other
+}
+
+enum concepts_type {
+  person
+  place
+  concept
+  event
+  document
+  idea
+  other
+}
+
+enum links_relationship_type {
+  related_to
+  part_of
+  similar_to
+  causes
+  enables
+  requires
+  contradicts
+  example_of
+  other
+}
+
+enum notes_source_type {
+  web
+  book
+  paper
+  video
+  personal
+  other
+}
+
+enum sources_source_type {
+  book
+  article
+  website
+  video
+  podcast
+  paper
+  other
+}
