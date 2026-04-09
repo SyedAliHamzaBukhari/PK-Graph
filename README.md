@@ -265,26 +265,6 @@ npm test
 npm test
 ```
 
-## Scalability Considerations
-
-### Database Scaling
-- Connection pooling for high concurrency
-- Read replicas for read-heavy workloads
-- Partitioning for large datasets
-- Query optimization and indexing
-
-### Application Scaling
-- Stateless API design
-- Horizontal scaling support
-- Load balancing ready
-- Caching strategies
-
-### Performance Monitoring
-- Real-time performance metrics
-- Query execution tracking
-- Resource usage monitoring
-- Automated alerting
-
 ## License (polite)
 
 This project is provided as educational material for database design and full-stack development courses.
