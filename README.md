@@ -2,11 +2,11 @@
 
 A comprehensive, semester-quality database-heavy project implementing a personal knowledge management system with graph-based relationships between concepts, notes, and sources.
 
-## 🚀 Project Overview
+## Project Overview
 
 This project demonstrates advanced database design, full-stack development, and knowledge graph visualization. It implements a complete Personal Knowledge Graph system that allows users to create, manage, and explore interconnected knowledge through concepts, notes, tags, sources, and relationships.
 
-### 🎯 Key Features
+### Key Features
 
 #### Database Layer
 - **Advanced Schema Design**: Normalized 3NF database with 10+ tables
@@ -30,7 +30,7 @@ This project demonstrates advanced database design, full-stack development, and 
 - **Search & Analytics**: Advanced search and real-time analytics
 - **Responsive Design**: Mobile-first responsive interface
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 personal-knowledge-graph/
@@ -87,7 +87,7 @@ personal-knowledge-graph/
 └── package.json                 # Root package.json
 ```
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 ### Database
 - **MySQL 8.0+**: Primary database with advanced features
@@ -110,7 +110,7 @@ personal-knowledge-graph/
 - **shadcn/ui**: Modern UI component library
 - **Lucide React**: Icon library
 
-## 📊 Database Schema
+## Database Schema
 
 ### Core Tables
 
@@ -137,7 +137,7 @@ Flexible categorization and citation system
 - **query_history**: Search analytics and performance tracking
 - **graph_metrics**: Daily graph statistics
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Node.js 18+ and npm
@@ -182,7 +182,7 @@ npm run dev
 ### 5. Access the Application
 - Frontend: http://localhost:3000
 
-## 📖 API Documentation
+## API Documentation
 
 ### Core Endpoints
 
@@ -207,7 +207,7 @@ npm run dev
 - `GET /api/graph/export` - Export graph data
 
 
-## 🔧 Advanced Features
+## Advanced Features
 
 ### Graph Algorithms
 - **N-hop Traversal**: Find all concepts within N connections
@@ -229,7 +229,7 @@ npm run dev
 - **Graph Statistics**: Real-time graph metrics
 - **Usage Patterns**: User behavior analysis
 
-## 📈 Performance Benchmarks
+## Performance Benchmarks
 
 ### Database Performance
 - **Concept Search**: < 100ms for 1000+ concepts
@@ -243,7 +243,7 @@ npm run dev
 - **Data Volume**: Optimized for 10,000+ concepts, 50,000+ notes
 - **Search Performance**: Sub-second full-text search
 
-## 🧪 Testing
+## Testing
 
 ### Database Tests
 ```bash
@@ -268,7 +268,7 @@ npm test
 npm test
 ```
 
-## 📈 Scalability Considerations
+## Scalability Considerations
 
 ### Database Scaling
 - Connection pooling for high concurrency
@@ -288,7 +288,7 @@ npm test
 - Resource usage monitoring
 - Automated alerting
 
-## 📝 License
+## License (polite)
 
 This project is provided as educational material for database design and full-stack development courses.
 
