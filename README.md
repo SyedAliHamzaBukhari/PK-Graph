@@ -1,12 +1,10 @@
 # Personal Knowledge Graph (PKG)
 
-A comprehensive, semester-quality database-heavy project implementing a personal knowledge management system with graph-based relationships between concepts, notes, and sources.
-
-## Project Overview
-
-This project demonstrates advanced database design, full-stack development, and knowledge graph visualization. It implements a complete Personal Knowledge Graph system that allows users to create, manage, and explore interconnected knowledge through concepts, notes, tags, sources, and relationships.
+A comprehensive, database-heavy project implementing a personal knowledge management system with graph-based relationships between concepts, notes, and sources.
 
 ### Key Features
+
+This project demonstrates advanced database design, full-stack development, and knowledge graph visualization. It implements a complete Personal Knowledge Graph system that allows users to create, manage, and explore interconnected knowledge through concepts, notes, tags, sources, and relationships.
 
 #### Database Layer
 - **Advanced Schema Design**: Normalized 3NF database with 10+ tables
@@ -20,7 +18,6 @@ This project demonstrates advanced database design, full-stack development, and 
 #### Backend API
 - **RESTful API**: Node.js/Express with comprehensive endpoints
 - **Graph Algorithms**: Cytoscape.js integration for visualization
-- **AI Integration**: Content analysis using z-ai-web-dev-sdk
 - **Security**: Rate limiting, CORS, input validation
 - **Performance**: Connection pooling, compression, caching
 
